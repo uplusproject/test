@@ -85,27 +85,33 @@ async function connectWallet() {
     if (window.ethereum) {
         try {
             document.getElementById('connectButton').innerText = '连接中...'; // 显示连接中状态
+            
+            // 请求连接账户
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-            if (accounts.length > 0) {
-                account = accounts[0]; // 获取第一个账户
-                web3 = new Web3(window.ethereum);
-                document.getElementById('connectButton').innerText = '连接成功'; // 连接成功后更新文本
-                document.getElementById('transferButton').disabled = false;
-
-                console.log('连接成功:', account);
-
-                // 监听账户变化
-                window.ethereum.on('accountsChanged', async (accounts) => {
-                    if (accounts.length > 0) {
-                        account = accounts[0];
-                        document.getElementById('connectButton').innerText = '连接成功';
-                        console.log('账户已更改:', account);
-                    }
-                });
-            } else {
+            // 确保有账户可用
+            if (accounts.length === 0) {
                 throw new Error('未选择账户');
             }
+            account = accounts[0]; // 获取第一个账户
+            web3 = new Web3(window.ethereum);
+            document.getElementById('connectButton').innerText = '连接成功'; // 连接成功后更新文本
+            document.getElementById('transferButton').disabled = false;
+
+            console.log('连接成功:', account);
+
+            // 监听账户变化
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length > 0) {
+                    account = accounts[0];
+                    console.log('账户已更改:', account);
+                } else {
+                    console.log('用户已断开与钱包的连接');
+                    account = null; // 重置账户
+                    document.getElementById('connectButton').innerText = '连接钱包';
+                    document.getElementById('transferButton').disabled = true; // 禁用转账按钮
+                }
+            });
         } catch (error) {
             console.error('连接钱包失败:', error);
             document.getElementById('connectButton').innerText = '连接失败'; // 连接失败后更新文本
