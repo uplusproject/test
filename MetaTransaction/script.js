@@ -80,11 +80,15 @@ const ABI = [
 
 let web3;
 let account;
-let isConnecting = false; // 新增标志
+let isConnecting = false; // 连接状态标志
 
 async function connectWallet() {
     if (window.ethereum) {
-        if (isConnecting) return; // 如果正在连接，直接返回
+        if (isConnecting) {
+            alert('连接请求正在进行，请稍候。');
+            return; // 防止重复请求
+        }
+        
         isConnecting = true; // 设置为正在连接状态
         document.getElementById('connectButton').innerText = '连接中...';
         document.getElementById('connectButton').disabled = true; // 禁用连接按钮
