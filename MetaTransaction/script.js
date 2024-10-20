@@ -86,7 +86,6 @@ async function connectWallet() {
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             account = accounts[0]; // 确保获取第一个账户
-
             web3 = new Web3(window.ethereum);
 
             document.getElementById('connectButton').innerText = '连接成功';
@@ -94,8 +93,10 @@ async function connectWallet() {
 
             console.log('连接成功:', account);
 
+            // 监听账户变化
             window.ethereum.on('accountsChanged', async (accounts) => {
                 account = accounts[0];
+                document.getElementById('connectButton').innerText = '连接成功';
                 console.log('账户已更改:', account);
             });
         } catch (error) {
@@ -122,7 +123,6 @@ async function transferTokens() {
             return;
         }
 
-        // 确保amount是数字类型
         const amountToSend = web3.utils.toBN(amount);
 
         const messageHash = web3.utils.soliditySha3(account, recipient, amountToSend);
