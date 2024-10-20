@@ -88,7 +88,7 @@ async function connectWallet() {
             alert('连接请求正在进行，请稍候。');
             return; // 防止重复请求
         }
-        
+
         isConnecting = true; // 设置为正在连接状态
         document.getElementById('connectButton').innerText = '连接中...';
         document.getElementById('connectButton').disabled = true; // 禁用连接按钮
