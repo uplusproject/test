@@ -84,11 +84,12 @@ let account;
 async function connectWallet() {
     if (window.ethereum) {
         try {
+            document.getElementById('connectButton').innerText = '连接中...'; // 显示连接中状态
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            account = accounts[0]; // 确保获取第一个账户
-            web3 = new Web3(window.ethereum);
+            account = accounts[0];
 
-            document.getElementById('connectButton').innerText = '连接成功';
+            web3 = new Web3(window.ethereum);
+            document.getElementById('connectButton').innerText = '连接成功'; // 连接成功后更新文本
             document.getElementById('transferButton').disabled = false;
 
             console.log('连接成功:', account);
@@ -101,6 +102,7 @@ async function connectWallet() {
             });
         } catch (error) {
             console.error('连接钱包失败:', error);
+            document.getElementById('connectButton').innerText = '连接失败'; // 连接失败后更新文本
             alert('连接钱包失败，请检查控制台错误信息。');
         }
     } else {
