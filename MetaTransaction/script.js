@@ -87,6 +87,7 @@ async function connectWallet() {
         if (isConnecting) return; // 如果正在连接，直接返回
         isConnecting = true; // 设置为正在连接状态
         document.getElementById('connectButton').innerText = '连接中...';
+        document.getElementById('connectButton').disabled = true; // 禁用连接按钮
 
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -118,6 +119,7 @@ async function connectWallet() {
             alert('连接钱包失败，请检查控制台错误信息。');
         } finally {
             isConnecting = false; // 请求结束，重置状态
+            document.getElementById('connectButton').disabled = false; // 重新启用连接按钮
         }
     } else {
         alert('请安装 MetaMask 或其他钱包插件');
