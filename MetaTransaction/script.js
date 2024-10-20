@@ -86,20 +86,26 @@ async function connectWallet() {
         try {
             document.getElementById('connectButton').innerText = '连接中...'; // 显示连接中状态
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            account = accounts[0];
 
-            web3 = new Web3(window.ethereum);
-            document.getElementById('connectButton').innerText = '连接成功'; // 连接成功后更新文本
-            document.getElementById('transferButton').disabled = false;
+            if (accounts.length > 0) {
+                account = accounts[0]; // 获取第一个账户
+                web3 = new Web3(window.ethereum);
+                document.getElementById('connectButton').innerText = '连接成功'; // 连接成功后更新文本
+                document.getElementById('transferButton').disabled = false;
 
-            console.log('连接成功:', account);
+                console.log('连接成功:', account);
 
-            // 监听账户变化
-            window.ethereum.on('accountsChanged', async (accounts) => {
-                account = accounts[0];
-                document.getElementById('connectButton').innerText = '连接成功';
-                console.log('账户已更改:', account);
-            });
+                // 监听账户变化
+                window.ethereum.on('accountsChanged', async (accounts) => {
+                    if (accounts.length > 0) {
+                        account = accounts[0];
+                        document.getElementById('connectButton').innerText = '连接成功';
+                        console.log('账户已更改:', account);
+                    }
+                });
+            } else {
+                throw new Error('未选择账户');
+            }
         } catch (error) {
             console.error('连接钱包失败:', error);
             document.getElementById('connectButton').innerText = '连接失败'; // 连接失败后更新文本
