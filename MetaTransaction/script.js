@@ -127,7 +127,7 @@ async function transferTokens() {
         const messageHash = web3.utils.soliditySha3(account, recipient, amount);
         
         // 签署消息
-        const signature = await web3.eth.personal.sign(messageHash, account);
+        const signature = await web3.eth.personal.sign(web3.utils.sha3(messageHash), account);
         
         // 调用 executeMetaTransaction
         const tx = await contract.methods.executeMetaTransaction(account, recipient, amount, signature).send({ from: account });
