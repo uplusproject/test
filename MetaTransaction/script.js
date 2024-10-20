@@ -88,6 +88,11 @@ async function connectWallet() {
             web3 = new Web3(window.ethereum);
             account = window.ethereum.selectedAddress || (await web3.eth.getAccounts())[0];
 
+            // Ensure account is set correctly
+            if (!account) {
+                throw new Error('未能获取账户地址');
+            }
+
             document.getElementById('connectButton').innerText = '连接成功';
             document.getElementById('transferButton').disabled = false;
 
@@ -135,7 +140,7 @@ async function transferTokens() {
         alert('转账成功！');
     } catch (error) {
         console.error('转账失败:', error);
-        alert('转账失败，请检查控制台错误信息。');
+        alert(`转账失败，请检查控制台错误信息: ${error.message}`);
     }
 }
 
