@@ -40,13 +40,11 @@ async function connectWallet() {
         web3 = new Web3(window.ethereum);
         account = (await web3.eth.getAccounts())[0];
         
-        // 更新按钮文本并启用转账按钮
         document.getElementById('connectButton').innerText = '连接成功';
         document.getElementById('transferButton').disabled = false;
 
         console.log('连接成功:', account);
         
-        // 监听账户变化
         window.ethereum.on('accountsChanged', async (accounts) => {
             account = accounts[0];
             console.log('账户已更改:', account);
@@ -74,10 +72,12 @@ async function transferTokens() {
 
         // 创建消息哈希
         const messageHash = web3.utils.soliditySha3(account, recipient, amount);
-        
+        const messageHashHex = web3.utils.keccak256(messageHash); // 使用 keccak256
+
         // 签署消息
-        const signature = await web3.eth.personal.sign(web3.utils.sha3(messageHash), account);
+        const signature = await web3.eth.personal.sign(messageHashHex, account);
         
+        console.log('生成的消息哈希:', messageHashHex);
         console.log('签名:', signature);
         
         // 调用 executeMetaTransaction
