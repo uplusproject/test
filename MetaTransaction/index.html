@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DApp 示例</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
-    <script src="script.js" defer></script> <!-- 引入外部的 JavaScript 文件 -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DApp 转账</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>连接钱包并执行转账</h1>
-    
-    <!-- 连接钱包按钮 -->
-    <button id="connectButton">连接钱包</button>
-    
-    <!-- 转账按钮，初始状态下禁用 -->
-    <button id="transferButton" disabled>转账</button>
+  <div class="container">
+    <h1>USDT DApp 转账</h1>
+    <button id="connectWalletButton">连接钱包</button>
+    <button id="transferTokensButton" disabled>转移代币</button>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
