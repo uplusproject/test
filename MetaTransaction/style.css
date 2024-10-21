@@ -31,3 +31,7 @@ button.hidden {
 p {
     margin: 10px 0;
 }
+
+#signatureInfo {
+    margin-top: 20px;
+}
