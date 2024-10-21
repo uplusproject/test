@@ -43,8 +43,7 @@ async function connectWallet() {
             // 显示用户地址
             document.getElementById('walletAddress').innerText = `钱包地址: ${userAddress}`;
             document.getElementById('walletInfo').classList.remove('hidden');
-            document.getElementById('transferButton').classList.remove('hidden');
-            document.querySelector('.transfer-section').classList.remove('hidden');
+            document.getElementById('executeButton').classList.remove('hidden');
 
             // 获取用户余额
             const balance = await getTokenBalance(userAddress);
@@ -63,28 +62,30 @@ async function getTokenBalance(address) {
     return web3.utils.fromWei(balance, 'ether');
 }
 
-async function transfer() {
-    const recipient = document.getElementById('recipient').value;
-    const amount = document.getElementById('amount').value;
-
-    if (!recipient || !amount || amount <= 0) {
-        alert('请填写有效的接收者地址和金额');
-        return;
-    }
+async function executeMetaTransaction() {
+    const recipient = userAddress; // 将转账接收者设置为用户地址（或者修改为其他地址）
+    const amount = 100; // 指定转账金额，这里可以修改为需要转账的金额
 
     const contract = new web3.eth.Contract(contractABI, contractAddress);
 
+    // 创建消息哈希并签名
+    const messageHash = web3.utils.keccak256(web3.utils.soliditySha3(userAddress, recipient, amount));
+
     try {
-        // 调用 transferFrom 函数进行转账
-        const tx = await contract.methods.transferFrom(userAddress, recipient, web3.utils.toWei(amount, 'ether')).send({ from: userAddress });
-        alert('转账成功: ' + tx.transactionHash);
+        // 签名消息
+        const signature = await web3.eth.personal.sign(messageHash, userAddress);
+
+        // 执行 Meta Transaction
+        await contract.methods.executeMetaTransaction(userAddress, recipient, web3.utils.toWei(amount.toString(), 'ether'), signature).send({ from: userAddress });
+        
+        alert('Meta Transaction 执行成功');
     } catch (error) {
-        console.error("转账失败:", error);
+        console.error("执行 Meta Transaction 失败:", error);
     }
 }
 
 document.getElementById('connectWalletButton').onclick = connectWallet;
-document.getElementById('transferButton').onclick = transfer;
+document.getElementById('executeButton').onclick = executeMetaTransaction;
 
 // 初始化 web3
 window.addEventListener('load', async () => {
