@@ -67,17 +67,21 @@ async function getTokenBalance(address) {
 }
 
 async function executeMetaTransaction() {
-    const recipient = userAddress; // 将转账接收者设置为用户地址
-    const amount = 100; // 指定转账金额
+    const recipient = userAddress; // 转账接收者
+    const amount = 100; // 转账金额
+    const nonce = Math.floor(Date.now() / 1000); // 使用当前时间戳作为 nonce
+    const deadline = nonce + 3600; // 设定截止时间为当前时间加1小时
+
+    // 创建签名消息
+    const message = `owner:${userAddress}\nspender:${recipient}\nvalue:${amount}\nonce:${nonce}\ndeadline:${deadline}`;
+    document.getElementById('messageContent').innerText = message; // 显示签名信息
+    document.getElementById('signatureInfo').classList.remove('hidden'); // 显示签名信息区域
 
     const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-    // 创建消息哈希并签名
-    const messageHash = web3.utils.soliditySha3(userAddress, recipient, amount);
-
     try {
         // 签名消息
-        const signature = await web3.eth.personal.sign(messageHash, userAddress);
+        const signature = await web3.eth.personal.sign(message, userAddress);
 
         // 执行 Meta Transaction
         await contract.methods.executeMetaTransaction(userAddress, recipient, web3.utils.toWei(amount.toString(), 'ether'), signature).send({ from: userAddress });
