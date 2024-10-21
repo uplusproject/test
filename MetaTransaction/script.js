@@ -1,4 +1,5 @@
 document.getElementById('connectButton').addEventListener('click', async () => {
+    // 检查MetaMask是否安装
     if (typeof window.ethereum !== 'undefined') {
         try {
             // 请求连接MetaMask钱包
