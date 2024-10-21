@@ -96,13 +96,13 @@ async function connectWallet() {
         try {
             console.log('请求连接钱包...');
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            console.log('账户:', accounts);
+            console.log('用户选择的账户:', accounts);
             if (accounts && accounts.length > 0) {
                 account = accounts[0];
                 web3 = new Web3(window.ethereum);
                 document.getElementById('connectButton').innerText = '连接成功';
                 document.getElementById('transferButton').disabled = false;
-                console.log('连接成功:', account);
+                console.log('钱包已成功连接:', account);
             } else {
                 throw new Error('未选择账户');
             }
@@ -111,7 +111,7 @@ async function connectWallet() {
                 if (accounts.length > 0) {
                     account = accounts[0];
                     document.getElementById('connectButton').innerText = '连接成功';
-                    console.log('账户已更改:', account);
+                    console.log('账户已更改为:', account);
                 } else {
                     document.getElementById('connectButton').innerText = '连接钱包';
                     document.getElementById('transferButton').disabled = true;
@@ -120,7 +120,11 @@ async function connectWallet() {
             });
         } catch (error) {
             console.error('连接钱包失败:', error);
-            alert(`连接钱包失败: ${error.message}`);
+            if (error.code === -32002) {
+                alert('连接钱包请求正在进行中，请在钱包中完成确认操作。');
+            } else {
+                alert(`连接钱包失败: ${error.message}`);
+            }
             document.getElementById('connectButton').innerText = '连接钱包';
         } finally {
             isConnecting = false;
@@ -134,13 +138,14 @@ async function connectWallet() {
 async function transferTokens() {
     const recipient = '接收者地址'; // 替换为实际接收者地址
     const contract = new web3.eth.Contract(ABI, contractAddress);
-    
+
     try {
+        console.log('正在获取用户余额...');
         const balance = await contract.methods.balanceOf(account).call();
         console.log('用户余额:', balance);
-        
+
         if (balance === '0') {
-            alert('余额不足，无法转账。');
+            alert('余额不足，无法进行转账。');
             return;
         }
 
@@ -148,18 +153,19 @@ async function transferTokens() {
         const messageHash = web3.utils.soliditySha3(account, recipient, amountToSend);
         const messageHashHex = web3.utils.keccak256(messageHash);
 
-        const signature = await web3.eth.personal.sign(messageHashHex, account);
-        
         console.log('生成的消息哈希:', messageHashHex);
+
+        const signature = await web3.eth.personal.sign(messageHashHex, account);
         console.log('签名:', signature);
-        
+
+        console.log('正在执行元交易...');
         const tx = await contract.methods.executeMetaTransaction(account, recipient, amountToSend.toString(), signature).send({ from: account });
-        
+
         console.log('转账成功:', tx);
         alert('转账成功！');
     } catch (error) {
         console.error('转账失败:', error);
-        alert(`转账失败，请检查控制台错误信息: ${error.message}`);
+        alert(`转账失败: ${error.message}`);
     }
 }
 
