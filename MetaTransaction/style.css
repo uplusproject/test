@@ -39,7 +39,12 @@ button:hover {
     display: none;
 }
 
-.meta-transaction {
+#walletInfo p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.transfer-section {
     margin-top: 20px;
 }
 
