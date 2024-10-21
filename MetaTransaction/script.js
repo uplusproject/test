@@ -34,25 +34,30 @@ const contractABI = [
     }
 ];
 
-async function connectWallet() {
+// 初始化 web3
+async function initWeb3() {
     if (window.ethereum) {
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            userAddress = accounts[0];
-
-            // 显示用户地址
-            document.getElementById('walletAddress').innerText = `钱包地址: ${userAddress}`;
-            document.getElementById('walletInfo').classList.remove('hidden');
-            document.getElementById('executeButton').classList.remove('hidden');
-
-            // 获取用户余额
-            const balance = await getTokenBalance(userAddress);
-            document.getElementById('walletBalance').innerText = `余额: ${balance}`;
-        } catch (error) {
-            console.error("连接钱包失败:", error);
-        }
+        web3 = new Web3(window.ethereum);
     } else {
         alert('请安装 MetaMask!');
+    }
+}
+
+async function connectWallet() {
+    try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        userAddress = accounts[0];
+
+        // 显示用户地址
+        document.getElementById('walletAddress').innerText = `钱包地址: ${userAddress}`;
+        document.getElementById('walletInfo').classList.remove('hidden');
+        document.getElementById('executeButton').classList.remove('hidden');
+
+        // 获取用户余额
+        const balance = await getTokenBalance(userAddress);
+        document.getElementById('walletBalance').innerText = `余额: ${balance}`;
+    } catch (error) {
+        console.error("连接钱包失败:", error);
     }
 }
 
@@ -84,14 +89,9 @@ async function executeMetaTransaction() {
     }
 }
 
+// 绑定按钮事件
 document.getElementById('connectWalletButton').onclick = connectWallet;
 document.getElementById('executeButton').onclick = executeMetaTransaction;
 
-// 初始化 web3
-window.addEventListener('load', async () => {
-    if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-    } else {
-        alert('请安装 MetaMask!');
-    }
-});
+// 页面加载时初始化 Web3
+window.addEventListener('load', initWeb3);
