@@ -10,10 +10,15 @@
     <div class="container">
         <h1>Meta Transaction DApp</h1>
         <button id="connectWalletButton">连接钱包</button>
-        <div id="walletInfo" class="hidden"></div>
-        <div class="meta-transaction">
-            <h2>执行元交易</h2>
-            <button id="signButton" class="hidden">签名并转移全部余额</button>
+        <div id="walletInfo" class="hidden">
+            <p id="walletAddress"></p>
+            <p id="walletBalance"></p>
+        </div>
+        <div class="transfer-section hidden">
+            <h2>转账</h2>
+            <input type="text" id="recipient" placeholder="接收者地址">
+            <input type="number" id="amount" placeholder="金额">
+            <button id="transferButton">转账</button>
         </div>
     </div>
 
