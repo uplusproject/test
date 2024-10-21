@@ -6,16 +6,22 @@
     <title>Meta Transaction 示例</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
-    <script src="script.js" defer></script>
 </head>
 <body>
-    <h1>Meta Transaction 示例</h1>
-    <button id="connectButton">连接钱包</button>
+    <div class="container">
+        <h1>Meta Transaction 示例</h1>
+        <button id="connectButton">连接钱包</button>
+        
+        <form id="transferForm" style="display: none;">
+            <h2>转移资产</h2>
+            <label for="recipientAddress">接收地址:</label>
+            <input type="text" id="recipientAddress" required>
+            <label for="amountToTransfer">转移金额 (ETH):</label>
+            <input type="number" id="amountToTransfer" required>
+            <button type="submit">转移 ETH</button>
+        </form>
+    </div>
 
-    <form id="transferForm" style="display:none;">
-        <input type="text" id="recipientAddress" placeholder="接收者地址" required />
-        <input type="text" id="amountToTransfer" placeholder="转移数量（例如 0.01 ETH）" required />
-        <button type="submit">转移代币</button>
-    </form>
+    <script src="script.js"></script>
 </body>
 </html>
