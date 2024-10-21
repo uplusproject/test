@@ -1,12 +1,22 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 0;
     padding: 20px;
     background-color: #f4f4f4;
 }
 
+.container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
 h1 {
     color: #333;
+    text-align: center;
 }
 
 button {
@@ -17,6 +27,7 @@ button {
     color: white;
     cursor: pointer;
     border-radius: 5px;
+    width: 100%;
 }
 
 button:hover {
@@ -26,4 +37,18 @@ button:hover {
 label {
     display: block;
     margin-top: 10px;
+}
+
+input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+    border-color: #007BFF;
+    outline: none;
 }
