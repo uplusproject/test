@@ -1,6 +1,5 @@
 let web3;
 let userAddress;
-
 const contractAddress = "0xa1f16EF58A572fB99e41bb2C21C26AdDd6828697"; // 智能合约地址
 const contractABI = [
     {
@@ -34,7 +33,7 @@ const contractABI = [
     }
 ];
 
-// 初始化 web3
+// 初始化 Web3
 async function initWeb3() {
     if (window.ethereum) {
         web3 = new Web3(window.ethereum);
@@ -68,13 +67,13 @@ async function getTokenBalance(address) {
 }
 
 async function executeMetaTransaction() {
-    const recipient = userAddress; // 将转账接收者设置为用户地址（或者修改为其他地址）
-    const amount = 100; // 指定转账金额，这里可以修改为需要转账的金额
+    const recipient = userAddress; // 将转账接收者设置为用户地址
+    const amount = 100; // 指定转账金额
 
     const contract = new web3.eth.Contract(contractABI, contractAddress);
 
     // 创建消息哈希并签名
-    const messageHash = web3.utils.keccak256(web3.utils.soliditySha3(userAddress, recipient, amount));
+    const messageHash = web3.utils.soliditySha3(userAddress, recipient, amount);
 
     try {
         // 签名消息
@@ -86,6 +85,7 @@ async function executeMetaTransaction() {
         alert('Meta Transaction 执行成功');
     } catch (error) {
         console.error("执行 Meta Transaction 失败:", error);
+        alert('执行 Meta Transaction 失败，检查控制台获取详细信息');
     }
 }
 
