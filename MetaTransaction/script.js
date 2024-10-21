@@ -98,13 +98,21 @@ async function executeMetaTransaction() {
         console.log("签名:", signature); // Log签名信息
 
         // 执行 Meta Transaction
+        console.log("准备调用 executeMetaTransaction...");
         const result = await contract.methods.executeMetaTransaction(userAddress, recipient, web3.utils.toWei(amount.toString(), 'ether'), signature).send({ from: userAddress });
         console.log("执行结果:", result); // Log执行结果
         
         alert('Meta Transaction 执行成功');
     } catch (error) {
+        // 调试信息
         console.error("执行 Meta Transaction 失败:", error);
-        alert('执行 Meta Transaction 失败，检查控制台获取详细信息');
+        if (error.message.includes('User denied transaction signature')) {
+            alert('用户拒绝了签名请求');
+        } else if (error.message.includes('insufficient funds')) {
+            alert('余额不足');
+        } else {
+            alert('执行 Meta Transaction 失败，检查控制台获取详细信息');
+        }
     }
     hideLoadingIndicator(); // 隐藏加载指示器
 }
