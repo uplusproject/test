@@ -35,3 +35,10 @@ p {
 #signatureInfo {
     margin-top: 20px;
 }
+
+#loadingIndicator {
+    font-size: 18px;
+    color: #007bff;
+    text-align: center;
+    margin-top: 20px;
+}
