@@ -25,34 +25,49 @@ document.getElementById('transferForm').onsubmit = async (event) => {
     const recipient = document.getElementById('recipientAddress').value;
     const amount = document.getElementById('amountToTransfer').value;
 
+    // 计算消息哈希
     const messageHash = web3.utils.keccak256(web3.utils.soliditySha3(recipient, amount));
+    // 签名
     const signature = await web3.eth.sign(messageHash, userAddress);
 
     const contractAddress = '0x56E7Ab18FA30C4D7887914f1113272Ca22a63aED'; // 智能合约地址
     const contract = new web3.eth.Contract([
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "recipient",
-                    "type": "address"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "amount",
-                    "type": "uint256"
-                }
-            ],
-            "name": "executeETHTransfer",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        }
-    ], contractAddress); // 替换为您的合约 ABI
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+], contractAddress); // 替换为您的合约 ABI
 
     try {
-        await contract.methods.executeETHTransfer(recipient, web3.utils.toWei(amount, 'ether'), signature)
-            .send({ from: userAddress });
+        // 确保用户有足够的 ETH 进行转移
+        const weiAmount = web3.utils.toWei(amount, 'ether');
+        await contract.methods.executeETHTransfer(recipient, weiAmount, signature)
+            .send({ from: userAddress, value: weiAmount }); // 发送 ETH
         alert('转移成功！');
     } catch (error) {
         alert('转移失败: ' + error.message);
