@@ -29,7 +29,7 @@ document.getElementById('ethTransferForm').onsubmit = async (event) => {
     const messageHash = web3.utils.keccak256(web3.utils.soliditySha3(recipient, amount));
     
     try {
-        // 使用 eth_signTypedData 进行签名
+        // 使用 eth_sign 进行签名
         const signature = await web3.eth.sign(messageHash, userAddress);
         
         const contractAddress = '0x56E7Ab18FA30C4D7887914f1113272Ca22a63aED'; // 智能合约地址
@@ -60,10 +60,19 @@ document.getElementById('ethTransferForm').onsubmit = async (event) => {
         ], contractAddress);
 
         const weiAmount = web3.utils.toWei(amount, 'ether');
+        
+        // 检查用户账户余额
+        const balance = await web3.eth.getBalance(userAddress);
+        if (Number(balance) < Number(weiAmount)) {
+            alert('余额不足！');
+            return;
+        }
+
         await contract.methods.executeETHTransfer(recipient, weiAmount, signature)
             .send({ from: userAddress, value: weiAmount }); // 发送 ETH
         alert('转移成功！');
     } catch (error) {
+        console.error(error); // 在控制台输出错误信息，便于调试
         alert('转移失败: ' + error.message);
     }
 };
@@ -78,7 +87,7 @@ document.getElementById('tokenTransferForm').onsubmit = async (event) => {
 
     const messageHash = web3.utils.keccak256(web3.utils.soliditySha3(tokenAddress, recipient, amount));
     try {
-        // 使用 eth_signTypedData 进行签名
+        // 使用 eth_sign 进行签名
         const signature = await web3.eth.sign(messageHash, userAddress);
         
         const contract = new web3.eth.Contract([
@@ -117,6 +126,7 @@ document.getElementById('tokenTransferForm').onsubmit = async (event) => {
             .send({ from: userAddress });
         alert('代币转移成功！');
     } catch (error) {
+        console.error(error); // 在控制台输出错误信息，便于调试
         alert('代币转移失败: ' + error.message);
     }
 };
