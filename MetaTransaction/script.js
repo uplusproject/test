@@ -59,7 +59,6 @@ document.getElementById('ethTransferForm').onsubmit = async (event) => {
     ], contractAddress);
 
     try {
-        // 确保用户有足够的 ETH 进行转移
         const weiAmount = web3.utils.toWei(amount, 'ether');
         await contract.methods.executeETHTransfer(recipient, weiAmount, signature)
             .send({ from: userAddress, value: weiAmount }); // 发送 ETH
