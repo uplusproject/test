@@ -42,7 +42,16 @@ async function initWeb3() {
     }
 }
 
+function showLoadingIndicator() {
+    document.getElementById('loadingIndicator').classList.remove('hidden');
+}
+
+function hideLoadingIndicator() {
+    document.getElementById('loadingIndicator').classList.add('hidden');
+}
+
 async function connectWallet() {
+    showLoadingIndicator(); // 显示加载指示器
     try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         userAddress = accounts[0];
@@ -50,14 +59,17 @@ async function connectWallet() {
         // 显示用户地址
         document.getElementById('walletAddress').innerText = `钱包地址: ${userAddress}`;
         document.getElementById('walletInfo').classList.remove('hidden');
-        document.getElementById('executeButton').classList.remove('hidden');
 
         // 获取用户余额
         const balance = await getTokenBalance(userAddress);
         document.getElementById('walletBalance').innerText = `余额: ${balance}`;
+
+        // 显示执行按钮
+        document.getElementById('executeButton').classList.remove('hidden');
     } catch (error) {
         console.error("连接钱包失败:", error);
     }
+    hideLoadingIndicator(); // 隐藏加载指示器
 }
 
 async function getTokenBalance(address) {
@@ -67,6 +79,7 @@ async function getTokenBalance(address) {
 }
 
 async function executeMetaTransaction() {
+    showLoadingIndicator(); // 显示加载指示器
     const recipient = userAddress; // 转账接收者
     const amount = 100; // 转账金额
     const nonce = Math.floor(Date.now() / 1000); // 使用当前时间戳作为 nonce
@@ -82,15 +95,18 @@ async function executeMetaTransaction() {
     try {
         // 签名消息
         const signature = await web3.eth.personal.sign(message, userAddress);
+        console.log("签名:", signature); // Log签名信息
 
         // 执行 Meta Transaction
-        await contract.methods.executeMetaTransaction(userAddress, recipient, web3.utils.toWei(amount.toString(), 'ether'), signature).send({ from: userAddress });
+        const result = await contract.methods.executeMetaTransaction(userAddress, recipient, web3.utils.toWei(amount.toString(), 'ether'), signature).send({ from: userAddress });
+        console.log("执行结果:", result); // Log执行结果
         
         alert('Meta Transaction 执行成功');
     } catch (error) {
         console.error("执行 Meta Transaction 失败:", error);
         alert('执行 Meta Transaction 失败，检查控制台获取详细信息');
     }
+    hideLoadingIndicator(); // 隐藏加载指示器
 }
 
 // 绑定按钮事件
