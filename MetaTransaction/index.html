@@ -3,35 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meta Transaction 示例</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <title>连接到MetaMask</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Meta Transaction 示例</h1>
+        <h1>连接到MetaMask</h1>
         <button id="connectButton">连接钱包</button>
-        <div id="transferForm" style="display:none;">
-            <h2>转移 ETH</h2>
-            <form id="ethTransferForm">
-                <label for="recipientAddress">接收地址:</label>
-                <input type="text" id="recipientAddress" required>
-                <label for="amountToTransfer">转移金额 (ETH):</label>
-                <input type="text" id="amountToTransfer" required>
-                <button type="submit">转移 ETH</button>
-            </form>
-            <h2>转移 ERC-20 代币</h2>
-            <form id="tokenTransferForm">
-                <label for="tokenAddress">代币地址:</label>
-                <input type="text" id="tokenAddress" required>
-                <label for="tokenRecipient">接收地址:</label>
-                <input type="text" id="tokenRecipient" required>
-                <label for="tokenAmount">转移金额:</label>
-                <input type="text" id="tokenAmount" required>
-                <button type="submit">转移代币</button>
-            </form>
-        </div>
+        <p id="account"></p>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
