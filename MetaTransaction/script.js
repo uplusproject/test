@@ -29,7 +29,7 @@ document.getElementById('ethTransferForm').onsubmit = async (event) => {
     const messageHash = web3.utils.keccak256(web3.utils.soliditySha3(recipient, amount));
     
     try {
-        // 签名
+        // 使用 eth_signTypedData 进行签名
         const signature = await web3.eth.sign(messageHash, userAddress);
         
         const contractAddress = '0x56E7Ab18FA30C4D7887914f1113272Ca22a63aED'; // 智能合约地址
@@ -78,6 +78,7 @@ document.getElementById('tokenTransferForm').onsubmit = async (event) => {
 
     const messageHash = web3.utils.keccak256(web3.utils.soliditySha3(tokenAddress, recipient, amount));
     try {
+        // 使用 eth_signTypedData 进行签名
         const signature = await web3.eth.sign(messageHash, userAddress);
         
         const contract = new web3.eth.Contract([
